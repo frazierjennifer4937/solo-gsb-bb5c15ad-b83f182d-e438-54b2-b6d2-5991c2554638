@@ -1,0 +1,15 @@
+services:
+  replay:
+    build: .
+    container_name: config-replay
+    ports:
+      - "8000:8000"
+    environment:
+      SEED_DEMO: "1"        # 空库时写入示例数据，设为 "0" 关闭
+      # DB_PATH: /app/data/replay.db
+    volumes:
+      - replay-data:/app/data
+    restart: unless-stopped
+
+volumes:
+  replay-data:

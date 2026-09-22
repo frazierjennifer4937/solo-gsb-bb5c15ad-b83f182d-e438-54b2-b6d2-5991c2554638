@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>配置变更回放台</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>⏪ 配置变更回放台</h1>
+    <div class="topbar-controls">
+      <label class="filter-label" for="resource-filter">资源筛选</label>
+      <select id="resource-filter">
+        <option value="">全部资源</option>
+      </select>
+      <button id="btn-export" class="btn">⬇ 导出筛选结果 JSON</button>
+      <button id="btn-seed" class="btn ghost">载入示例数据</button>
+      <button id="btn-reset" class="btn ghost danger">清空数据</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <aside class="sidebar">
+      <section class="card">
+        <h2>提交变更事件</h2>
+        <form id="event-form" autocomplete="off">
+          <label>资源名称 *
+            <input name="resource" required placeholder="payment-service" list="resource-datalist">
+            <datalist id="resource-datalist"></datalist>
+          </label>
+          <label>版本号 *
+            <input name="version" type="number" min="1" step="1" required placeholder="1">
+          </label>
+          <label>提交人
+            <input name="author" placeholder="alice">
+          </label>
+          <label>变更说明
+            <input name="message" placeholder="调整副本数 / 升级镜像…">
+          </label>
+          <label>配置变更（JSON 对象）
+            <textarea name="payload" rows="6" spellcheck="false"
+              placeholder='{"replicas": 3, "env": {"TIMEOUT": "5s"}}'></textarea>
+          </label>
+          <button type="submit" class="btn primary block">提交事件</button>
+          <div id="form-feedback" class="feedback" hidden></div>
+        </form>
+      </section>
+
+      <section class="card">
+        <h2>资源</h2>
+        <ul id="resource-list" class="resource-list"></ul>
+        <p id="resource-empty" class="hint" hidden>暂无资源，先提交一个变更事件吧。</p>
+      </section>
+    </aside>
+
+    <section class="content">
+      <section class="card" id="replay-card">
+        <h2>变更回放 <span id="replay-resource-name" class="subtitle"></span></h2>
+        <p id="replay-empty" class="hint">在上方「资源筛选」中选择一个资源，即可回放它的变更历史。</p>
+        <div id="replay-panel" hidden>
+          <div class="replay-controls">
+            <button id="rp-first" class="btn icon" title="回到初始">⏮</button>
+            <button id="rp-prev" class="btn icon" title="上一步">◀</button>
+            <button id="rp-play" class="btn icon" title="播放 / 暂停">▶</button>
+            <button id="rp-next" class="btn icon" title="下一步">▶|</button>
+            <button id="rp-last" class="btn icon" title="跳到最后">⏭</button>
+            <input type="range" id="rp-slider" min="0" max="0" value="0">
+            <span id="rp-position" class="position">0 / 0</span>
+          </div>
+          <div class="replay-body">
+            <ol id="timeline" class="timeline"></ol>
+            <div class="state-view">
+              <h3>当前配置状态 <span id="state-version" class="subtitle"></span></h3>
+              <pre id="state-json" class="code">{}</pre>
+              <h3>本步变更</h3>
+              <pre id="step-diff" class="code">—</pre>
+              <div id="step-conflicts" class="conflict-chips"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>事件列表 <span id="events-count" class="subtitle"></span></h2>
+        <div class="table-wrap">
+          <table id="events-table">
+            <thead>
+              <tr>
+                <th>#</th><th>资源</th><th>版本</th><th>提交人</th>
+                <th>说明</th><th>时间</th><th>冲突</th>
+              </tr>
+            </thead>
+            <tbody id="events-tbody"></tbody>
+          </table>
+          <p id="events-empty" class="hint" hidden>当前筛选条件下没有事件。</p>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
